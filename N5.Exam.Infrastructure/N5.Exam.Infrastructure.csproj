@@ -1,0 +1,25 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net5.0</TargetFramework>
+    <UserSecretsId>9f733880-ceea-42e9-8a08-f38666183b13</UserSecretsId>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="DataSeed\PermissionType.json" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="DataSeed\PermissionType.json" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="5.0.14" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="5.0.14" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\N5.Exam.Shared\N5.Exam.Shared.csproj" />
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,20 @@
+{
+  "profiles": {
+    "Docker Compose": {
+      "commandName": "DockerCompose",
+      "composeLaunchAction": "LaunchBrowser",
+      "composeLaunchServiceName": "api",
+      "composeLaunchUrl": "http://localhost/swagger",
+      "commandVersion": "1.0",
+      "serviceActions": {
+        "api": "StartDebugging",
+        "consumer": "StartDebugging",
+        "elasticsearch": "StartWithoutDebugging",
+        "kafka": "StartWithoutDebugging",
+        "kibana": "StartWithoutDebugging",
+        "sqldb": "StartWithoutDebugging",
+        "zookeeper": "StartWithoutDebugging"
+      }
+    }
+  }
+}

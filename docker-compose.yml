@@ -1,0 +1,93 @@
+version: '3.8'
+
+services:
+    sqldb:
+        container_name: sqldb
+        image: "mcr.microsoft.com/mssql/server"
+        ports:
+            - 1434:1433
+        environment:
+            SA_PASSWORD: "N5Exam11"
+            ACCEPT_EULA: "Y"
+        volumes: 
+            - sqldb:/var/opt/mssql
+    elasticsearch:
+       container_name: elasticsearch
+       image: docker.elastic.co/elasticsearch/elasticsearch:7.9.2
+       ports:
+        - 9200:9200
+       volumes:
+        - elasticsearch-data:/usr/share/elasticsearch/data
+       environment:
+        - xpack.monitoring.enabled=true
+        - xpack.watcher.enabled=false
+        - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+        - discovery.type=single-node
+    kibana:
+       container_name: kibana
+       image: docker.elastic.co/kibana/kibana:7.9.2
+       ports:
+        - 5601:5601
+       depends_on:
+        - elasticsearch
+       environment:
+        - ELASTICSEARCH_URL=http://localhost:9200
+
+    consumer:
+        container_name: consumer
+        build:
+            context: ./N5.Exam.Consumer
+        ports:
+            - 8000:8000
+        environment:
+            - ASPNETCORE_ENVIRONMENT=Development
+        depends_on:
+            - api
+            - kafka
+    api:
+        container_name: n5examapi
+        build:
+            context: ./N5.Exam.API
+        volumes:
+            - logs:/var/n5examapi/logs
+        ports:
+            - "80:80"
+        environment:
+            - ASPNETCORE_ENVIRONMENT=Development
+        depends_on:
+            - elasticsearch
+            - sqldb
+            - kafka
+    zookeeper:
+        image: confluentinc/cp-zookeeper:7.0.1
+        hostname: zookeeper
+        container_name: zookeeper
+        ports:
+          - "2181:2181"
+        environment:
+          - ZOOKEEPER_CLIENT_PORT=2181
+          - ZOOKEEPER_TICK_TIME=2000
+    kafka:
+        image: confluentinc/cp-kafka:7.0.1
+        hostname: kafka
+        container_name: kafka
+        depends_on:
+          - zookeeper
+        ports:
+          - "9092:9092"
+          #- "9101:9101"
+        environment:
+            - KAFKA_ZOOKEEPER_CONNECT=zookeeper:2181
+            - KAFKA_BROKERID=1
+            - ALLOW_PLAINTEXT_LISTENER="yes"
+            - KAFKA_LISTENER_SECURITY_PROTOCOL_MAP=PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+            - KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://kafka:9092,PLAINTEXT_HOST://kafka:29092
+            - KAFKA_LISTENERS=PLAINTEXT://:29092,PLAINTEXT_HOST://:9092
+            - KAFKA_INTER_BROKER_LISTENER_NAME=PLAINTEXT
+            - KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR=1
+   
+
+volumes:
+  elasticsearch-data:
+  sqldb:
+  logs:
